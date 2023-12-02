@@ -8,17 +8,21 @@ contract Token is Ownable, ERC20 {
 
     uint256 public constant INITIAL_SUPPLY = 100000000 * 1e18;
 
+    address public minter;
+
     constructor(
         string memory name,
         string memory symbol) ERC20(name, symbol){
 
+        _mint(msg.sender, INITIAL_SUPPLY);
     }
 
-    function mint(address _to, uint256 _amount) public onlyOwner {
-        _mint(_to, _amount);
+    function setMinter(address _minter) external onlyOwner {
+        minter = _minter;
     }
 
-    function burn(address _from, uint256 _amount) public {
+    function burn(address _from, uint256 _amount) external {
+        require(minter == _msgSender(), "caller is not from minter");
         _burn(_from, _amount);
     }
 }
